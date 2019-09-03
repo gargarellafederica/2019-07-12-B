@@ -5,8 +5,10 @@
 package it.polito.tdp.food;
 
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
+import it.polito.tdp.food.model.Food;
 import it.polito.tdp.food.model.Model;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -41,7 +43,7 @@ public class FoodController {
     private Button btnSimula; // Value injected by FXMLLoader
 
     @FXML // fx:id="boxFood"
-    private ComboBox<?> boxFood; // Value injected by FXMLLoader
+    private ComboBox<Food> boxFood; // Value injected by FXMLLoader
 
     @FXML // fx:id="txtResult"
     private TextArea txtResult; // Value injected by FXMLLoader
@@ -49,16 +51,40 @@ public class FoodController {
     @FXML
     void doCreaGrafo(ActionEvent event) {
     	txtResult.clear();
-    	txtResult.appendText("Creazione grafo...");
+    	String porzione=txtPorzioni.getText().trim();
+    	if(porzione.length()==0) {
+    		txtResult.appendText("Inserire un valore!");
+    		return;
+    	} else {
+    		if(!porzione.matches("[0-9]")) {
+    			txtResult.appendText("Carattere non corretto: Inserire un valore numerico!\n");
+    			return;
+    		}
+    	}
+    	int porz=Integer.parseInt(porzione);
+    	this.model.creagrafo(porz);
+    	
+    	txtResult.appendText("Grafo creato ha " + this.model.getnvertici()+ " vertici e " + this.model.getnarchi()+ " archi\n");
+    	boxFood.getItems().addAll(this.model.getlistavertici());  
+    	txtResult.appendText("Numero vertici box" + this.model.getlistavertici().size());
+
     }
 
     @FXML
     void doGrassi(ActionEvent event) {
     	txtResult.clear();
-    	txtResult.appendText("Analisi grassi...");
+    	if(boxFood.getValue()==null) {
+    		txtResult.appendText("Selezionare un valore!\n");
+    		return;
+    		}
+    	Food ciboscelto= boxFood.getValue();
+    	txtResult.appendText("Cibi con grassi minori per " + ciboscelto+ " sono: ");
+    	List<Food> succ=this.model.getgrassiminori(ciboscelto);
+    	txtResult.appendText(succ.toString()+"\n");
     }
 
-    @FXML
+
+	@FXML
     void doSimula(ActionEvent event) {
     	txtResult.clear();
     	txtResult.appendText("Simulazione...");
